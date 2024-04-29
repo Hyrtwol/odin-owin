@@ -1,0 +1,90 @@
+// +build windows
+// +vet
+package owin
+
+import "base:intrinsics"
+import win32 "core:sys/windows"
+
+int2 :: [2]i32
+
+L :: intrinsics.constant_utf16_cstring
+wstring :: win32.wstring
+utf8_to_wstring :: win32.utf8_to_wstring
+wstring_to_utf8 :: win32.wstring_to_utf8
+utf8_to_utf16 :: win32.utf8_to_utf16
+utf16_to_utf8 :: win32.utf16_to_utf8
+
+DWORD :: win32.DWORD
+BYTE :: win32.BYTE
+BOOL :: win32.BOOL
+WORD :: win32.WORD
+LONG :: win32.LONG
+INT :: win32.INT
+UINT :: win32.UINT
+WCHAR :: win32.WCHAR
+
+HANDLE :: win32.HANDLE
+HMODULE :: win32.HMODULE
+HINSTANCE :: win32.HINSTANCE
+HWND :: win32.HWND
+HDC :: win32.HDC
+HRGN :: win32.HRGN
+HGDIOBJ :: win32.HGDIOBJ
+HBITMAP :: win32.HBITMAP
+HPEN :: win32.HPEN
+HBRUSH :: win32.HBRUSH
+
+LPARAM :: win32.LPARAM
+WPARAM :: win32.WPARAM
+LRESULT :: win32.LRESULT
+
+POINT :: win32.POINT
+RECT :: win32.RECT
+CREATESTRUCTW :: win32.CREATESTRUCTW
+PCREATESTRUCTW :: ^CREATESTRUCTW
+
+HPEN_NULL :: win32.HPEN(uintptr(win32.PS_NULL))
+HBRUSH_NULL :: win32.HBRUSH(uintptr(win32.BS_NULL))
+HGDIOBJ_PS_NULL :: win32.HGDIOBJ(HPEN_NULL)
+HGDIOBJ_BS_NULL :: win32.HGDIOBJ(HBRUSH_NULL)
+
+LANGID_NEUTRAL_DEFAULT :: DWORD(win32.SUBLANG_DEFAULT) << 10 | DWORD(win32.LANG_NEUTRAL) & 0x3FF
+
+WM_SIZE_WPARAM :: enum WPARAM {
+	RESTORED  = win32.SIZE_RESTORED,
+	MINIMIZED = win32.SIZE_MINIMIZED,
+	MAXIMIZED = win32.SIZE_MAXIMIZED,
+	MAXSHOW   = win32.SIZE_MAXSHOW,
+	MAXHIDE   = win32.SIZE_MAXHIDE,
+}
+
+WM_MSG :: enum UINT {
+	WM_CREATE      = win32.WM_CREATE,
+	WM_DESTROY     = win32.WM_DESTROY,
+	WM_ERASEBKGND  = win32.WM_ERASEBKGND,
+	WM_SETFOCUS    = win32.WM_SETFOCUS,
+	WM_KILLFOCUS   = win32.WM_KILLFOCUS,
+	WM_SIZE        = win32.WM_SIZE,
+	WM_PAINT       = win32.WM_PAINT,
+	WM_CHAR        = win32.WM_CHAR,
+	WM_TIMER       = win32.WM_TIMER,
+	WM_MOUSEMOVE   = win32.WM_MOUSEMOVE,
+	WM_LBUTTONDOWN = win32.WM_LBUTTONDOWN,
+	WM_RBUTTONDOWN = win32.WM_RBUTTONDOWN,
+}
+
+WNDPROC :: #type proc "system" (hwnd: HWND, msg: WM_MSG, wparam: WPARAM, lparam: LPARAM) -> LRESULT
+
+// Key State Masks for Mouse Messages
+
+MOUSE_KEY_STATE_FLAG :: enum DWORD {
+	MK_LBUTTON,
+	MK_RBUTTON,
+	MK_SHIFT,
+	MK_CONTROL,
+	MK_MBUTTON,
+	MK_XBUTTON1,
+	MK_XBUTTON2,
+}
+
+MOUSE_KEY_STATE :: bit_set[MOUSE_KEY_STATE_FLAG;DWORD]
