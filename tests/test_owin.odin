@@ -65,4 +65,45 @@ check_mouse_key_state_flags :: proc(t: ^testing.T) {
 	expect_state(t, {.MK_MBUTTON}, win32.MK_MBUTTON)
 	expect_state(t, {.MK_XBUTTON1}, win32.MK_XBUTTON1)
 	expect_state(t, {.MK_XBUTTON2}, win32.MK_XBUTTON2)
+
+}
+@(test)
+make_lresult_from_false :: proc(t: ^testing.T) {
+	exp := 0
+	result := ow.MAKELRESULT(false)
+	expect_value(t, result, exp)
+}
+
+@(test)
+make_lresult_from_true :: proc(t: ^testing.T) {
+	exp := 1
+	result := ow.MAKELRESULT(true)
+	expect_value(t, result, exp)
+}
+
+verify_macros :: proc(t: ^testing.T) {
+	// minwindef.h
+	// expect_value(t, ow.MAKEWORD(1, 2), 0x00000201)
+	// expect_value(t, ow.MAKEWORD(0x1111, 0x2222), 0x00002211)
+	// expect_value(t, ow.MAKELONG(1, 2), 0x00020001)
+	// expect_value(t, ow.MAKELONG(0x1111, 0x2222), 0x22221111)
+	// expect_value(t, ow.LOWORD(0x12345678), 0x00005678)
+	// expect_value(t, ow.HIWORD(0x12345678), 0x00001234)
+	// expect_value(t, u32(ow.LOBYTE(0x1234)), 0x00000034)
+	// expect_value(t, u32(ow.HIBYTE(0x1234)), 0x00000012)
+
+	// winuser.h
+	// expect_value(t, ow.MAKEWPARAM(1, 2), 0x00020001)
+	// expect_value(t, ow.MAKEWPARAM(0x1111, 0x2222), 0x22221111)
+	// expect_value(t, ow.MAKELPARAM(1, 2), 0x00020001)
+	// expect_value(t, ow.MAKELPARAM(0x1111, 0x2222), 0x22221111)
+	expect_value(t, ow.MAKELRESULT(1, 2), 0x00020001)
+	expect_value(t, ow.MAKELRESULT(0x1111, 0x2222), 0x22221111)
+
+	// winnt.h
+	// expect_value(t, ow.MAKELCID(1, 2), 0x00020001)
+	// expect_value(t, ow.MAKELCID(0x1111, 0x2222), 0x22221111)
+	// expect_value(t, ow.MAKELANGID(1, 2), 0x00000801)
+	// expect_value(t, ow.MAKELANGID(0x111, 0x222), 0x00088911)
+	// expect_value(t, ow.LANGIDFROMLCID(0x12345678), 0x00005678)
 }

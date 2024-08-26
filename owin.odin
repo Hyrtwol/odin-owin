@@ -47,6 +47,20 @@ show_last_errorf :: #force_inline proc(format: string, args: ..any, loc := #call
 }
 
 
+
+MAKELRESULT_FROM_LOHI :: #force_inline proc "contextless" (#any_int l, h: int) -> LRESULT {
+	return win32.LRESULT(win32.MAKELONG(l, h))
+}
+
+MAKELRESULT_FROM_BOOL :: #force_inline proc "contextless" (result: BOOL) -> LRESULT {
+	return win32.LRESULT(transmute(i32)result)
+}
+
+MAKELRESULT :: proc {
+	MAKELRESULT_FROM_LOHI,
+	MAKELRESULT_FROM_BOOL,
+}
+
 decode_lparam_as_int2 :: #force_inline proc "contextless" (lparam: LPARAM) -> int2 {
 	return {win32.GET_X_LPARAM(lparam), win32.GET_Y_LPARAM(lparam)}
 }
