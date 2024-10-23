@@ -8,6 +8,7 @@ import "shared:ounit"
 T :: testing.T
 expect_value :: testing.expect_value
 expect_size :: ounit.expect_size
+expect_flags :: ounit.expect_flags
 
 @(test)
 verify_sizes :: proc(t: ^testing.T) {
@@ -39,6 +40,7 @@ verify_sizes :: proc(t: ^testing.T) {
 	expect_size(t, ow.RECT, 16)
 	expect_size(t, ow.CREATESTRUCTW, 80)
 	expect_size(t, ow.WM_SIZE_WPARAM, 8)
+	expect_size(t, ow.WM_SIZING_WPARAM, 8)
 	expect_size(t, ow.WM_MSG, 4)
 	expect_size(t, ow.MOUSE_KEY_STATE, 4)
 }
@@ -47,8 +49,6 @@ verify_sizes :: proc(t: ^testing.T) {
 verify_consts :: proc(t: ^testing.T) {
 	expect_value(t, ow.HPEN_NULL, ow.HPEN(uintptr(5)))
 	expect_value(t, ow.HBRUSH_NULL, ow.HBRUSH(uintptr(1)))
-	expect_value(t, ow.HGDIOBJ_PS_NULL, ow.HGDIOBJ(uintptr(5)))
-	expect_value(t, ow.HGDIOBJ_BS_NULL, ow.HGDIOBJ(uintptr(1)))
 	expect_value(t, ow.LANGID_NEUTRAL_DEFAULT, 0x400)
 	expect_value(t, ow.LANGID_NEUTRAL_DEFAULT, win32.MAKELANGID(win32.LANG_NEUTRAL, win32.SUBLANG_DEFAULT))
 }
@@ -81,6 +81,14 @@ make_lresult_from_true :: proc(t: ^testing.T) {
 	expect_value(t, result, exp)
 }
 
+@(test)
+verify_rawinput_code :: proc(t: ^testing.T) {
+	expect_value(t, ow.GET_RAWINPUT_CODE_WPARAM(0), ow.RAWINPUT_CODE.RIM_INPUT)
+	expect_value(t, ow.GET_RAWINPUT_CODE_WPARAM(1), ow.RAWINPUT_CODE.RIM_INPUTSINK)
+	expect_value(t, ow.GET_RAWINPUT_CODE_WPARAM(0x100), ow.RAWINPUT_CODE.RIM_INPUT)
+	expect_value(t, ow.GET_RAWINPUT_CODE_WPARAM(0x101), ow.RAWINPUT_CODE.RIM_INPUTSINK)
+}
+
 verify_macros :: proc(t: ^testing.T) {
 	// minwindef.h
 	// expect_value(t, ow.MAKEWORD(1, 2), 0x00000201)
@@ -106,4 +114,29 @@ verify_macros :: proc(t: ^testing.T) {
 	// expect_value(t, ow.MAKELANGID(1, 2), 0x00000801)
 	// expect_value(t, ow.MAKELANGID(0x111, 0x222), 0x00088911)
 	// expect_value(t, ow.LANGIDFROMLCID(0x12345678), 0x00005678)
+}
+
+verify_ws_ex_style :: proc(t: ^testing.T) {
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_DLGMODALFRAME}, 0x00000001)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_NOPARENTNOTIFY}, 0x00000004)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_TOPMOST}, 0x00000008)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_ACCEPTFILES}, 0x00000010)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_TRANSPARENT}, 0x00000020)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_MDICHILD}, 0x00000040)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_TOOLWINDOW}, 0x00000080)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_WINDOWEDGE}, 0x00000100)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_CLIENTEDGE}, 0x00000200)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_CONTEXTHELP}, 0x00000400)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_RIGHT}, 0x00001000)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_RTLREADING}, 0x00002000)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_LEFTSCROLLBAR}, 0x00004000)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_CONTROLPARENT}, 0x00010000)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_STATICEDGE}, 0x00020000)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_APPWINDOW}, 0x00040000)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_LAYERED}, 0x00080000)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_NOINHERITLAYOUT}, 0x00100000)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_NOREDIRECTIONBITMAP}, 0x00200000)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_LAYOUTRTL}, 0x00400000)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_COMPOSITED}, 0x02000000)
+	expect_flags(t, ow.WS_EX_STYLES{.WS_EX_NOACTIVATE}, 0x08000000)
 }

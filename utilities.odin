@@ -46,29 +46,6 @@ show_last_errorf :: #force_inline proc(format: string, args: ..any, loc := #call
 	show_last_error(fmt.tprintf(format, ..args), loc = loc)
 }
 
-
-
-MAKELRESULT_FROM_LOHI :: #force_inline proc "contextless" (#any_int l, h: int) -> LRESULT {
-	return win32.LRESULT(win32.MAKELONG(l, h))
-}
-
-MAKELRESULT_FROM_BOOL :: #force_inline proc "contextless" (result: BOOL) -> LRESULT {
-	return win32.LRESULT(transmute(i32)result)
-}
-
-MAKELRESULT :: proc {
-	MAKELRESULT_FROM_LOHI,
-	MAKELRESULT_FROM_BOOL,
-}
-
-decode_lparam_as_int2 :: #force_inline proc "contextless" (lparam: LPARAM) -> int2 {
-	return {win32.GET_X_LPARAM(lparam), win32.GET_Y_LPARAM(lparam)}
-}
-
-decode_wparam_as_mouse_key_state :: #force_inline proc "contextless" (wparam: win32.WPARAM) -> MOUSE_KEY_STATE {
-	return transmute(MOUSE_KEY_STATE)win32.DWORD(wparam)
-}
-
 get_rect_size :: #force_inline proc "contextless" (rect: ^RECT) -> int2 {
 	return {(rect.right - rect.left), (rect.bottom - rect.top)}
 }
@@ -79,7 +56,7 @@ get_client_size :: proc "contextless" (hwnd: HWND) -> int2 {
 	return get_rect_size(&rect)
 }
 
-adjust_window_size :: proc "contextless" (size: int2, dwStyle, dwExStyle: u32) -> int2 {
+adjust_window_size :: proc "contextless" (size: int2, dwStyle: WS_STYLES, dwExStyle: WS_EX_STYLES) -> int2 {
 	rect := RECT{0, 0, size.x, size.y}
 	if win32.AdjustWindowRectEx(&rect, dwStyle, false, dwExStyle) {
 		return get_rect_size(&rect)
@@ -87,8 +64,8 @@ adjust_window_size :: proc "contextless" (size: int2, dwStyle, dwExStyle: u32) -
 	return size
 }
 
-adjust_size_for_style :: proc(size: ^int2, dwStyle: win32.DWORD) {
-	rect := win32.RECT{0, 0, size.x, size.y}
+adjust_size_for_style :: proc(size: ^int2, dwStyle: WS_STYLES) {
+	rect := RECT{0, 0, size.x, size.y}
 	if win32.AdjustWindowRect(&rect, dwStyle, false) {
 		size^ = get_rect_size(&rect)
 	}
@@ -101,5 +78,5 @@ get_window_position :: proc(size: int2, center: bool) -> int2 {
 			return (dmsize - size) / 2
 		}
 	}
-	return {win32.CW_USEDEFAULT, win32.CW_USEDEFAULT}
+	return default_window_position
 }
