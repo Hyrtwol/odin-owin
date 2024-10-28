@@ -14,16 +14,23 @@ show_message_boxf :: #force_inline proc(caption: string, format: string, args: .
 	show_message_box(caption, fmt.tprintf(format, ..args))
 }
 
+@(private = "file")
+SHOW_ERROR_TITLE :: "Panic"
+@(private = "file")
+SHOW_ERROR_FORMAT :: "%s\nLast error: %x\n%v\n"
+
+@(private = "file")
 show_error :: #force_inline proc(msg: string, loc := #caller_location) {
-	show_message_boxf("Panic", "%s\nLast error: %x\n%v\n", msg, win32.GetLastError(), loc)
+	show_message_boxf(SHOW_ERROR_TITLE, SHOW_ERROR_FORMAT, msg, win32.GetLastError(), loc)
 }
 
-show_error_and_panic :: proc(msg: string, loc := #caller_location) {
-	show_error(msg, loc = loc)
-	fmt.panicf("%s (Last error: %x)", msg, win32.GetLastError(), loc = loc)
+show_error_and_panic :: proc(msg: string, loc := #caller_location) -> ! {
+	last_error := win32.GetLastError()
+	show_message_boxf(SHOW_ERROR_TITLE, SHOW_ERROR_FORMAT, msg, last_error, loc)
+	fmt.panicf("%s (Last error: %x)", msg, last_error, loc = loc)
 }
 
-show_error_and_panicf :: proc(format: string, args: ..any, loc := #caller_location) {
+show_error_and_panicf :: proc(format: string, args: ..any, loc := #caller_location) -> ! {
 	show_error_and_panic(fmt.tprintf(format, ..args), loc = loc)
 }
 
@@ -79,4 +86,14 @@ get_window_position :: proc(size: int2, center: bool) -> int2 {
 		}
 	}
 	return default_window_position
+}
+
+register_raw_input :: proc() {
+	rid := [?]win32.RAWINPUTDEVICE {
+		{usUsagePage = win32.HID_USAGE_PAGE_GENERIC, usUsage = win32.HID_USAGE_GENERIC_MOUSE, dwFlags = win32.RIDEV_NOLEGACY, hwndTarget = nil},
+		{usUsagePage = win32.HID_USAGE_PAGE_GENERIC, usUsage = win32.HID_USAGE_GENERIC_KEYBOARD, dwFlags = win32.RIDEV_NOLEGACY, hwndTarget = nil},
+	}
+	if !win32.RegisterRawInputDevices(&rid[0], len(rid), size_of(rid[0])){
+		show_error_and_panic("RegisterRawInputDevices Failed")
+	}
 }
