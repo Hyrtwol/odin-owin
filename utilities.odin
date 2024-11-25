@@ -40,13 +40,14 @@ show_last_error :: proc(caption: string, loc := #caller_location) {
 	error_text: [512]win32.WCHAR
 	error_wstring := wstring(&error_text)
 	cch := win32.FormatMessageW(win32.FORMAT_MESSAGE_FROM_SYSTEM | win32.FORMAT_MESSAGE_IGNORE_INSERTS, nil, last_error, LANGID_NEUTRAL_DEFAULT, error_wstring, len(error_text) - 1, nil)
-	if (cch != 0) {return}
-	error_string, err := wstring_to_utf8(&error_wstring[0], int(cch))
-	if err == .None {
-		fmt.eprintln(error_string)
-	} else {
-		fmt.eprintfln("Last error code: %d (0x%8X)", last_error)
+	if cch > 0 {
+		error_string, err := wstring_to_utf8(&error_wstring[0], int(cch))
+		if err == .None {
+			fmt.eprintln(error_string)
+			return
+		}
 	}
+	fmt.eprintfln("Last error code: %d (0x%8X)", last_error)
 }
 
 show_last_errorf :: #force_inline proc(format: string, args: ..any, loc := #caller_location) {
@@ -71,13 +72,6 @@ adjust_window_size :: proc "contextless" (size: int2, dwStyle: WS_STYLES, dwExSt
 	return size
 }
 
-adjust_size_for_style :: proc(size: ^int2, dwStyle: WS_STYLES) {
-	rect := RECT{0, 0, size.x, size.y}
-	if win32.AdjustWindowRect(&rect, dwStyle, false) {
-		size^ = get_rect_size(&rect)
-	}
-}
-
 get_window_position :: proc(size: int2, center: bool) -> int2 {
 	if center {
 		if deviceMode: win32.DEVMODEW; win32.EnumDisplaySettingsW(nil, win32.ENUM_CURRENT_SETTINGS, &deviceMode) {
@@ -88,12 +82,12 @@ get_window_position :: proc(size: int2, center: bool) -> int2 {
 	return default_window_position
 }
 
-register_raw_input :: proc() {
+register_raw_input :: proc(hwndTarget: HWND = nil, dwFlags: DWORD = win32.RIDEV_NOLEGACY) {
 	rid := [?]win32.RAWINPUTDEVICE {
-		{usUsagePage = win32.HID_USAGE_PAGE_GENERIC, usUsage = win32.HID_USAGE_GENERIC_MOUSE, dwFlags = win32.RIDEV_NOLEGACY, hwndTarget = nil},
-		{usUsagePage = win32.HID_USAGE_PAGE_GENERIC, usUsage = win32.HID_USAGE_GENERIC_KEYBOARD, dwFlags = win32.RIDEV_NOLEGACY, hwndTarget = nil},
+		{usUsagePage = win32.HID_USAGE_PAGE_GENERIC, usUsage = win32.HID_USAGE_GENERIC_MOUSE, dwFlags = dwFlags, hwndTarget = hwndTarget},
+		{usUsagePage = win32.HID_USAGE_PAGE_GENERIC, usUsage = win32.HID_USAGE_GENERIC_KEYBOARD, dwFlags = dwFlags, hwndTarget = hwndTarget},
 	}
-	if !win32.RegisterRawInputDevices(&rid[0], len(rid), size_of(rid[0])){
+	if !win32.RegisterRawInputDevices(&rid[0], len(rid), size_of(rid[0])) {
 		show_error_and_panic("RegisterRawInputDevices Failed")
 	}
 }
