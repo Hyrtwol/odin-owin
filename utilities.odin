@@ -38,10 +38,9 @@ show_last_error :: proc(caption: string, loc := #caller_location) {
 	fmt.eprintln(caption)
 	last_error := win32.GetLastError()
 	error_text: [512]win32.WCHAR
-	error_wstring := wstring(&error_text)
-	cch := win32.FormatMessageW(win32.FORMAT_MESSAGE_FROM_SYSTEM | win32.FORMAT_MESSAGE_IGNORE_INSERTS, nil, last_error, LANGID_NEUTRAL_DEFAULT, error_wstring, len(error_text) - 1, nil)
+	cch := win32.FormatMessageW(win32.FORMAT_MESSAGE_FROM_SYSTEM | win32.FORMAT_MESSAGE_IGNORE_INSERTS, nil, last_error, LANGID_NEUTRAL_DEFAULT, &error_text[0], len(error_text) - 1, nil)
 	if cch > 0 {
-		error_string, err := wstring_to_utf8(&error_wstring[0], int(cch))
+		error_string, err := wstring_to_utf8(wstring(&error_text[0]), int(cch))
 		if err == .None {
 			fmt.eprintln(error_string)
 			return
@@ -75,7 +74,7 @@ adjust_window_size :: proc "contextless" (size: int2, dwStyle: WS_STYLES, dwExSt
 get_window_position :: proc(size: int2, center: bool) -> int2 {
 	if center {
 		if deviceMode: win32.DEVMODEW; win32.EnumDisplaySettingsW(nil, win32.ENUM_CURRENT_SETTINGS, &deviceMode) {
-			dmsize: int2 = {i32(deviceMode.dmPelsWidth), i32(deviceMode.dmPelsHeight)} // is there an easier way to describe this?
+			dmsize: int2 = {i32(deviceMode.dmPelsWidth), i32(deviceMode.dmPelsHeight)}
 			return (dmsize - size) / 2
 		}
 	}
