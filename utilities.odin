@@ -53,6 +53,15 @@ show_last_errorf :: #force_inline proc(format: string, args: ..any, loc := #call
 	show_last_error(fmt.tprintf(format, ..args), loc = loc)
 }
 
+panic_if_failed :: proc(res: win32.HRESULT, message: string = #caller_expression(res), loc := #caller_location) {
+	if win32.SUCCEEDED(res) {
+		return
+	}
+
+	hr := win32.HRESULT_DETAILS(res)
+	fmt.panicf("Error %v %v (0x%0x)\n\t%v\n\t%v", win32.System_Error(hr.Code), hr, u32(hr), message, loc)
+}
+
 get_rect_size :: #force_inline proc "contextless" (rect: ^RECT) -> int2 {
 	return {(rect.right - rect.left), (rect.bottom - rect.top)}
 }
@@ -78,7 +87,7 @@ get_window_position :: proc(size: int2, center: bool) -> int2 {
 			return (dmsize - size) / 2
 		}
 	}
-	return default_window_position
+	return DEFAULT_WINDOW_POSITION
 }
 
 register_raw_input :: proc(hwndTarget: HWND = nil, dwFlags: DWORD = win32.RIDEV_NOLEGACY) {

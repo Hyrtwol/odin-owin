@@ -74,8 +74,8 @@ unregister_window_class :: proc(atom: ATOM, instance: HINSTANCE) {
 create_window :: proc(instance: HINSTANCE, atom: ATOM, settings: ^window_settings) -> HWND {
 	if atom == 0 {show_error_and_panic("atom is zero")}
 
-	if settings.dwStyle == {} {settings.dwStyle = default_dwStyle}
-	if settings.dwExStyle == {} {settings.dwExStyle = default_dwExStyle}
+	if settings.dwStyle == {} {settings.dwStyle = DEFAULT_WS_STYLE}
+	if settings.dwExStyle == {} {settings.dwExStyle = DEFAULT_WS_EX_STYLE}
 
 	size := adjust_window_size(settings.window_size, settings.dwStyle, settings.dwExStyle)
 	position := get_window_position(size, .Center in settings.options)
@@ -260,12 +260,12 @@ dib_usage :: enum UINT {
 	DIB_PAL_COLORS = win32.DIB_PAL_COLORS,
 }
 
-@(private = "file")
+//@(private = "file")
 create_dib_section_rawptr :: #force_inline proc "contextless" (hdc: HDC, pbmi: ^win32.BITMAPINFO, usage: dib_usage, ppvBits: ^^win32.VOID, hSection: HANDLE = nil, offset: DWORD = 0) -> HBITMAP {
 	return win32.CreateDIBSection(hdc, pbmi, UINT(usage), ppvBits, hSection, offset)
 }
 
-@(private = "file")
+//@(private = "file")
 create_dib_section_slice :: #force_inline proc "contextless" (hdc: HDC, pbmi: ^win32.BITMAPINFO, usage: dib_usage, ppvBits: ^[^]$T, hSection: HANDLE = nil, offset: DWORD = 0) -> HBITMAP {
 	return create_dib_section_rawptr(hdc, pbmi, usage, (^^win32.VOID)(ppvBits), hSection, offset)
 }
@@ -366,4 +366,14 @@ bit_blt_size :: #force_inline proc "contextless" (dest_hdc: HDC, size: int2, src
 bit_blt :: proc {
 	win32.BitBlt,
 	bit_blt_size,
+}
+
+@(private = "file")
+set_dib_color_table_byte4 :: #force_inline proc "contextless" (hdc: HDC, iStart: UINT, cEntries: UINT, prgbq: [^]byte4) -> UINT {
+	return win32.SetDIBColorTable(hdc, iStart, cEntries, (^win32.RGBQUAD)(prgbq))
+}
+
+set_dib_color_table :: proc {
+	win32.SetDIBColorTable,
+	set_dib_color_table_byte4,
 }
