@@ -28,7 +28,7 @@ set_settings :: #force_inline proc "contextless" (hwnd: HWND, settings: ^window_
 }
 
 get_settings :: #force_inline proc "contextless" (hwnd: HWND, $T: typeid) -> ^T where intrinsics.type_is_subtype_of(T, window_settings) {
-	return (^T)(rawptr(uintptr(win32.GetWindowLongPtrW(hwnd, win32.GWLP_USERDATA))))
+	return (^T)(uintptr(win32.GetWindowLongPtrW(hwnd, win32.GWLP_USERDATA)))
 }
 
 get_settings_from_createstruct :: #force_inline proc "contextless" (pcs: ^CREATESTRUCTW, $T: typeid) -> ^T where intrinsics.type_is_subtype_of(T, window_settings) {
