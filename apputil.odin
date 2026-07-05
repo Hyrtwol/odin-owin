@@ -390,3 +390,14 @@ set_dib_color_table :: proc {
 	win32.SetDIBColorTable,
 	set_dib_color_table_byte4,
 }
+
+draw_gdi_obj :: #force_inline proc "contextless" (hwnd: win32.HWND, hdc: win32.HDC, hdc_size: int2, hgdiobj: win32.HGDIOBJ, dest_size: int2) {
+	hdc_source := win32.CreateCompatibleDC(hdc)
+	defer win32.DeleteDC(hdc_source)
+	select_object(hdc_source, hgdiobj)
+	stretch_blt(hdc, hdc_size, hdc_source, dest_size)
+}
+
+draw_dib_hbitmap :: #force_inline proc "contextless" (hwnd: win32.HWND, hdc: win32.HDC, hdc_size: int2, hbitmap: win32.HBITMAP, dest_size: int2) {
+	draw_gdi_obj(hwnd, hdc, hdc_size, win32.HGDIOBJ(hbitmap), dest_size)
+}
