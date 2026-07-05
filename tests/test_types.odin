@@ -54,14 +54,14 @@ verify_consts :: proc(t: ^testing.T) {
 
 @(test)
 make_lresult_from_false :: proc(t: ^testing.T) {
-	exp := 0
+	exp: owin.LRESULT = 0
 	result := owin.MAKELRESULT(false)
 	expect_value(t, result, exp)
 }
 
 @(test)
 make_lresult_from_true :: proc(t: ^testing.T) {
-	exp := 1
+	exp: owin.LRESULT = 1
 	result := owin.MAKELRESULT(true)
 	expect_value(t, result, exp)
 }

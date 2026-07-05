@@ -18,7 +18,7 @@ window_settings :: struct {
 	options:     window_options,
 	dwStyle:     WS_STYLES,
 	dwExStyle:   WS_EX_STYLES,
-	wndproc:     WNDPROC,
+	wndproc:     win32.WNDPROC,
 	sleep:       time.Duration,
 	param:       LPVOID,
 }
@@ -47,11 +47,22 @@ DEFAULT_WINDOW_SETTINGS :: window_settings {
 	sleep       = DEFAULT_SLEEP,
 }
 
-create_window_settings :: proc "contextless" (size: int2, title: string, wndproc: WNDPROC) -> window_settings {
+@(private = "file")
+create_window_settings_win32 :: proc "contextless" (size: int2, title: string, wndproc: win32.WNDPROC) -> window_settings {
 	settings := DEFAULT_WINDOW_SETTINGS
 	settings.window_size = size
 	settings.wndproc = wndproc
 	//settings.run = run
 	settings.title = title
 	return settings
+}
+
+@(private = "file")
+create_window_settings_lean :: #force_inline proc "contextless" (size: int2, title: string, wndproc: WNDPROC) -> window_settings {
+	return create_window_settings(size, title, win32.WNDPROC(wndproc))
+}
+
+create_window_settings :: proc {
+	create_window_settings_win32,
+	create_window_settings_lean,
 }

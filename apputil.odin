@@ -3,7 +3,7 @@
 package owin
 
 import "core:fmt"
-import fp "core:path/filepath"
+import "core:path/filepath"
 import win32 "core:sys/windows"
 import "core:time"
 
@@ -41,7 +41,11 @@ load_cursor :: proc() -> HCURSOR {
 	return cursor
 }
 
-register_window_class :: proc(instance: HINSTANCE, wndproc: WNDPROC) -> ATOM {
+register_class :: proc {
+	win32.RegisterClassExW,
+}
+
+register_window_class_win32 :: proc(instance: HINSTANCE, wndproc: win32.WNDPROC) -> ATOM {
 
 	icon := load_icon(instance)
 	cursor := load_cursor()
@@ -49,7 +53,7 @@ register_window_class :: proc(instance: HINSTANCE, wndproc: WNDPROC) -> ATOM {
 	wcx := win32.WNDCLASSEXW {
 		cbSize        = size_of(win32.WNDCLASSEXW),
 		style         = win32.CS_HREDRAW | win32.CS_VREDRAW | win32.CS_OWNDC,
-		lpfnWndProc   = win32.WNDPROC(wndproc),
+		lpfnWndProc   = wndproc,
 		cbClsExtra    = 0,
 		cbWndExtra    = 0,
 		hInstance     = instance,
@@ -61,9 +65,18 @@ register_window_class :: proc(instance: HINSTANCE, wndproc: WNDPROC) -> ATOM {
 		hIconSm       = icon,
 	}
 
-	atom := win32.RegisterClassExW(&wcx)
+	atom := register_class(&wcx)
 	if atom == 0 {show_error_and_panic("Failed to register window class")}
 	return atom
+}
+
+register_window_class_lean :: proc(instance: HINSTANCE, wndproc: WNDPROC) -> ATOM {
+	return register_window_class_win32(instance, win32.WNDPROC(wndproc))
+}
+
+register_window_class :: proc {
+	register_window_class_win32,
+	register_window_class_lean,
 }
 
 unregister_window_class :: proc(atom: ATOM, instance: HINSTANCE) {
@@ -101,7 +114,7 @@ create_window :: proc(instance: HINSTANCE, atom: ATOM, settings: ^window_setting
 register_and_create_window :: proc(settings: ^window_settings) -> (instance: HINSTANCE, atom: ATOM, hwnd: HWND) {
 	module_handle := get_module_handle()
 	if settings.title == "" {
-		settings.title = fp.stem(get_module_filename(module_handle))
+		settings.title = filepath.stem(get_module_filename(module_handle))
 	}
 	instance = win32.HINSTANCE(module_handle)
 	atom = register_window_class(instance, settings.wndproc)
