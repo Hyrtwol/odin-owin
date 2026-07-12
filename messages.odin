@@ -22,6 +22,53 @@ decode_wm_size_params :: #force_inline proc "contextless" (wparam: WPARAM, lpara
 	return WM_SIZE_WPARAM(wparam), decode_lparam_as_int2(lparam)
 }
 
+decode_wm_key_input :: #force_inline proc "contextless" (wparam: WPARAM, lparam: LPARAM) -> (vk_code, key_flags, repeat_count: WORD) {
+	vk_code = win32.LOWORD(wparam) // virtual-key code
+	key_flags = win32.HIWORD(lparam)
+	repeat_count = win32.LOWORD(lparam) // repeat count, > 0 if several keydown messages was combined into one message
+	return
+}
+
+// is_key_released :: #force_inline proc "contextless" (key_flags: WORD) -> bool {
+// 	return (key_flags & win32.KF_UP) == win32.KF_UP // transition-state flag, 1 on keyup
+// }
+
+decode_key_flags :: #force_inline proc "contextless" (key_flags: WORD) -> (scan_code: WORD, is_extended_key: bool, was_key_down: bool, is_key_released: bool) {
+
+	scan_code = win32.WORD(win32.LOBYTE(key_flags)) // scan code
+	is_extended_key = (key_flags & win32.KF_EXTENDED) == win32.KF_EXTENDED // extended-key flag, 1 if scancode has 0xE0 prefix
+	if is_extended_key {scan_code = win32.MAKEWORD(scan_code, 0xE0)}
+	was_key_down = (key_flags & win32.KF_REPEAT) == win32.KF_REPEAT // previous key-state flag, 1 on autorepeat
+	is_key_released = (key_flags & win32.KF_UP) == win32.KF_UP // transition-state flag, 1 on keyup
+	// is_key_released = is_key_released(key_flags)
+	return
+}
+
+WMInput :: struct {
+	vk_code, key_flags, repeat_count: WORD,
+	scan_code:                        WORD,
+	is_extended_key:                  bool,
+	was_key_down:                     bool,
+	is_key_released:                  bool,
+}
+
+decode_wm_input :: #force_inline proc "contextless" (wparam: WPARAM, lparam: LPARAM) -> WMInput {
+	res: WMInput
+	res.vk_code, res.key_flags, res.repeat_count = decode_wm_key_input(wparam, lparam)
+	res.scan_code, res.is_extended_key, res.was_key_down, res.is_key_released = decode_key_flags(res.key_flags)
+
+	switch res.vk_code {
+	case win32.VK_SHIFT: // converts to VK_LSHIFT or VK_RSHIFT
+	case win32.VK_CONTROL: // converts to VK_LCONTROL or VK_RCONTROL
+	case win32.VK_MENU:
+		// converts to VK_LMENU or VK_RMENU
+		res.vk_code = win32.LOWORD(win32.MapVirtualKeyW(win32.DWORD(res.scan_code), win32.MAPVK_VSC_TO_VK_EX))
+		break
+	}
+
+	return res
+}
+
 decode_lparam_as_createstruct :: #force_inline proc "contextless" (lparam: LPARAM) -> ^CREATESTRUCTW {
 	return (^CREATESTRUCTW)(rawptr(uintptr(lparam)))
 }
