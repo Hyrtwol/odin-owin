@@ -11,15 +11,14 @@ expect_flags :: ounit.expect_flags
 
 @(test)
 verify_sizes :: proc(t: ^testing.T) {
-	expect_size(t, owin.DWORD, 4)
 	expect_size(t, owin.BYTE, 1)
 	expect_size(t, owin.BOOL, 4)
 	expect_size(t, owin.WORD, 2)
 	expect_size(t, owin.LONG, 4)
+	expect_size(t, owin.DWORD, 4)
 	expect_size(t, owin.INT, 4)
 	expect_size(t, owin.UINT, 4)
 	expect_size(t, owin.WCHAR, 2)
-
 	expect_size(t, owin.HANDLE, 8)
 	expect_size(t, owin.HMODULE, 8)
 	expect_size(t, owin.HINSTANCE, 8)
@@ -71,6 +70,7 @@ check_mouse_key_state_flags :: proc(t: ^testing.T) {
 	expect_state :: proc(t: ^testing.T, val: owin.MOUSE_KEY_STATE, exp: u32) {
 		expect_value(t, transmute(u32)val, exp)
 	}
+	expect_size(t, owin.MOUSE_KEY_STATE, 4)
 	expect_state(t, {.MK_LBUTTON}, win32.MK_LBUTTON)
 	expect_state(t, {.MK_RBUTTON}, win32.MK_RBUTTON)
 	expect_state(t, {.MK_SHIFT}, win32.MK_SHIFT)
