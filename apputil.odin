@@ -45,14 +45,14 @@ register_class :: proc {
 	win32.RegisterClassExW,
 }
 
-register_window_class_win32 :: proc(instance: HINSTANCE, wndproc: win32.WNDPROC) -> ATOM {
+register_window_class_win32 :: proc(instance: HINSTANCE, wndproc: win32.WNDPROC, style: CS_STYLES = DEFAULT_CS_STYLE) -> ATOM {
 
 	icon := load_icon(instance)
 	cursor := load_cursor()
 
 	wcx := win32.WNDCLASSEXW {
 		cbSize        = size_of(win32.WNDCLASSEXW),
-		style         = win32.CS_HREDRAW | win32.CS_VREDRAW | win32.CS_OWNDC,
+		style         = style,
 		lpfnWndProc   = wndproc,
 		cbClsExtra    = 0,
 		cbWndExtra    = 0,
@@ -70,8 +70,8 @@ register_window_class_win32 :: proc(instance: HINSTANCE, wndproc: win32.WNDPROC)
 	return atom
 }
 
-register_window_class_lean :: proc(instance: HINSTANCE, wndproc: WNDPROC) -> ATOM {
-	return register_window_class_win32(instance, win32.WNDPROC(wndproc))
+register_window_class_lean :: proc(instance: HINSTANCE, wndproc: WNDPROC, style: CS_STYLES = DEFAULT_CS_STYLE) -> ATOM {
+	return register_window_class_win32(instance, win32.WNDPROC(wndproc), style)
 }
 
 register_window_class :: proc {
@@ -84,7 +84,35 @@ unregister_window_class :: proc(atom: ATOM, instance: HINSTANCE) {
 	if !win32.UnregisterClassW(win32.LPCWSTR((^win32.WCHAR)(uintptr(atom))), instance) {show_error_and_panic("UnregisterClassW")}
 }
 
-create_window :: proc(instance: HINSTANCE, atom: ATOM, settings: ^window_settings) -> HWND {
+create_window_win32 :: proc(
+	dwExStyle: WS_EX_STYLES,
+	atom: ATOM,
+	lpWindowName: string,
+	dwStyle: WS_STYLES,
+	position: int2,
+	size: int2,
+	hWndParent: HWND,
+	hMenu: HMENU,
+	hInstance: HINSTANCE,
+	lpParam: LPVOID,
+) -> HWND {
+	hwnd := win32.CreateWindowExW(
+		dwExStyle,
+		win32.LPCWSTR((^win32.WCHAR)(uintptr(atom))),
+		utf8_to_wstring(lpWindowName),
+		dwStyle,
+		expand_values(position),
+		expand_values(size),
+		hWndParent,
+		hMenu,
+		hInstance,
+		lpParam,
+	)
+	if hwnd == nil {show_error_and_panic("create_window failed")}
+	return hwnd
+}
+
+create_window_from_settings :: proc(instance: HINSTANCE, atom: ATOM, settings: ^window_settings) -> HWND {
 	if atom == 0 {show_error_and_panic("atom is zero")}
 
 	if settings.dwStyle == {} {settings.dwStyle = DEFAULT_WS_STYLE}
@@ -93,22 +121,15 @@ create_window :: proc(instance: HINSTANCE, atom: ATOM, settings: ^window_setting
 	size := adjust_window_size(settings.window_size, settings.dwStyle, settings.dwExStyle)
 	position := get_window_position(size, .Center in settings.options)
 
-	hwnd := win32.CreateWindowExW(
-		settings.dwExStyle,
-		win32.LPCWSTR((^win32.WCHAR)(uintptr(atom))),
-		utf8_to_wstring(settings.title),
-		settings.dwStyle,
-		position.x,
-		position.y,
-		size.x,
-		size.y,
-		nil,
-		nil,
-		instance,
-		settings,
-	)
+	hwnd := create_window_win32(settings.dwExStyle, atom, settings.title, settings.dwStyle, position, size, nil, nil, instance, settings)
 	if hwnd == nil {show_error_and_panic("create_window failed")}
 	return hwnd
+}
+
+create_window :: proc {
+	win32.CreateWindowExW,
+	create_window_win32,
+	create_window_from_settings,
 }
 
 register_and_create_window :: proc(settings: ^window_settings) -> (instance: HINSTANCE, atom: ATOM, hwnd: HWND) {

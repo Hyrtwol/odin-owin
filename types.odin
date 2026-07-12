@@ -83,6 +83,8 @@ RAWINPUT_CODE :: win32.RAWINPUT_CODE
 
 // when #defined(win32.WS_STYLES) {}
 
+// Window Class Styles
+CS_STYLES :: UINT
 WS_STYLES :: win32.WS_STYLES
 WS_EX_STYLES :: win32.WS_EX_STYLES
 
