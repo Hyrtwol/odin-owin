@@ -72,9 +72,13 @@ get_client_size :: proc "contextless" (hwnd: HWND) -> int2 {
 	return get_rect_size(&rect)
 }
 
+adjust_window_rect :: proc "contextless" (lpRect: LPRECT, dwStyle: WS_STYLES, bMenu: BOOL, dwExStyle: WS_EX_STYLES) -> BOOL {
+	return win32.AdjustWindowRectEx(lpRect, win32.UINT(dwStyle), bMenu, win32.UINT(dwExStyle))
+}
+
 adjust_window_size :: proc "contextless" (size: int2, dwStyle: WS_STYLES, dwExStyle: WS_EX_STYLES) -> int2 {
 	rect := RECT{0, 0, size.x, size.y}
-	if win32.AdjustWindowRectEx(&rect, dwStyle, false, dwExStyle) {
+	if adjust_window_rect(&rect, dwStyle, false, dwExStyle) {
 		return get_rect_size(&rect)
 	}
 	return size

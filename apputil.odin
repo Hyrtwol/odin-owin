@@ -52,7 +52,7 @@ register_window_class_win32 :: proc(instance: HINSTANCE, wndproc: win32.WNDPROC,
 
 	wcx := win32.WNDCLASSEXW {
 		cbSize        = size_of(win32.WNDCLASSEXW),
-		style         = style,
+		style         = win32.UINT(style),
 		lpfnWndProc   = wndproc,
 		cbClsExtra    = 0,
 		cbWndExtra    = 0,
@@ -97,10 +97,10 @@ create_window_win32 :: proc(
 	lpParam: LPVOID,
 ) -> HWND {
 	hwnd := win32.CreateWindowExW(
-		dwExStyle,
+		win32.UINT(dwExStyle),
 		win32.LPCWSTR((^win32.WCHAR)(uintptr(atom))),
 		utf8_to_wstring(lpWindowName),
-		dwStyle,
+		win32.UINT(dwStyle),
 		expand_values(position),
 		expand_values(size),
 		hWndParent,
