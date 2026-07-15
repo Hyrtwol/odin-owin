@@ -4,7 +4,7 @@ package owin
 
 import win32 "core:sys/windows"
 
-stopwatch_tick :: u64
+stopwatch_tick :: win32.LARGE_INTEGER // i64
 stopwatch_time :: f64
 
 stopwatch :: struct {
@@ -32,13 +32,13 @@ stopwatch_start :: proc(this: ^stopwatch) {
 	win32.Sleep(0)
 	this.stop_tick = 0
 	this.elapsed_ticks = 0
-	win32.QueryPerformanceCounter(cast(^win32.LARGE_INTEGER)&this.start_tick)
+	win32.QueryPerformanceCounter(&this.start_tick)
 	this.last_tick = this.start_tick
 }
 
 @(private = "file")
 stopwatch_stop :: proc(this: ^stopwatch) {
-	win32.QueryPerformanceCounter(cast(^win32.LARGE_INTEGER)&this.stop_tick)
+	win32.QueryPerformanceCounter(&this.stop_tick)
 	this.elapsed_ticks = this.stop_tick - this.start_tick
 }
 
@@ -55,7 +55,7 @@ stopwatch_get_elapsed_ms :: proc(this: ^stopwatch) -> stopwatch_time {
 @(private = "file")
 stopwatch_get_delta_seconds :: proc(this: ^stopwatch) -> stopwatch_time {
 	tick: stopwatch_tick
-	win32.QueryPerformanceCounter(cast(^win32.LARGE_INTEGER)&tick)
+	win32.QueryPerformanceCounter(&tick)
 	delta_tick := tick - this.last_tick
 	this.last_tick = tick
 	return stopwatch_time(delta_tick) * ticks_to_seconds
@@ -64,7 +64,7 @@ stopwatch_get_delta_seconds :: proc(this: ^stopwatch) -> stopwatch_time {
 create_stopwatch :: proc() -> stopwatch {
 
 	if performance_frequency == 0 {
-		if win32.QueryPerformanceFrequency(cast(^win32.LARGE_INTEGER)&performance_frequency) {
+		if win32.QueryPerformanceFrequency(&performance_frequency) {
 			ticks_to_seconds = 1.0 / stopwatch_time(performance_frequency)
 			ticks_to_millisecond = 1_000.0 / stopwatch_time(performance_frequency)
 			ticks_to_timespan = 10_000_000.0 / stopwatch_time(performance_frequency)

@@ -20,42 +20,43 @@ wstring_to_utf8 :: win32.wstring_to_utf8
 utf8_to_utf16 :: win32.utf8_to_utf16
 utf16_to_utf8 :: win32.utf16_to_utf8
 
-DWORD :: win32.DWORD
-BYTE :: win32.BYTE
-BOOL :: win32.BOOL
-WORD :: win32.WORD
-LONG :: win32.LONG
-INT :: win32.INT
-UINT :: win32.UINT
-WCHAR :: win32.WCHAR
-DWORD_PTR :: win32.DWORD_PTR
-UINT_PTR :: win32.UINT_PTR
-LONG_PTR :: win32.LONG_PTR
+DWORD :: win32.DWORD // u32
+BYTE :: win32.BYTE // u8
+BOOL :: win32.BOOL // b32
+WORD :: win32.WORD // u16
+LONG :: win32.LONG // i32
+INT :: win32.INT // i32
+UINT :: win32.UINT // u32
+WCHAR :: win32.WCHAR // c.wchar_t
+// DWORD_PTR :: win32.DWORD_PTR
+UINT_PTR :: win32.UINT_PTR // uintptr
+LONG_PTR :: win32.LONG_PTR // int
+LARGE_INTEGER :: win32.LARGE_INTEGER // i64
 
-LPVOID :: win32.LPVOID
-LPCVOID :: win32.LPCVOID
-LPUINT :: win32.LPUINT
-LPSTR :: win32.LPSTR
-LPCSTR :: win32.LPCSTR
-LPWSTR :: win32.LPWSTR
-LPCWSTR :: win32.LPCWSTR
-LPDWORD :: win32.LPDWORD
+LPVOID :: win32.LPVOID // rawptr
+// LPCVOID :: win32.LPCVOID
+// LPUINT :: win32.LPUINT
+// LPSTR :: win32.LPSTR
+// LPCSTR :: win32.LPCSTR
+// LPWSTR :: win32.LPWSTR
+LPCWSTR :: win32.LPCWSTR // cstring16
+// LPDWORD :: win32.LPDWORD
 LPRECT :: win32.LPRECT
 
-ATOM :: win32.ATOM
-HANDLE :: win32.HANDLE
-HMODULE :: win32.HMODULE
-HINSTANCE :: win32.HINSTANCE
-HMENU :: win32.HMENU
-HWND :: win32.HWND
-HDC :: win32.HDC
-HRGN :: win32.HRGN
-HGDIOBJ :: win32.HGDIOBJ
-HBITMAP :: win32.HBITMAP
-HPEN :: win32.HPEN
-HBRUSH :: win32.HBRUSH
-HICON :: win32.HICON
-HCURSOR :: win32.HCURSOR
+ATOM :: win32.ATOM // u16
+HANDLE :: win32.HANDLE // rawptr
+HMODULE :: win32.HMODULE // rawptr
+HINSTANCE :: win32.HINSTANCE // rawptr
+HMENU :: win32.HMENU // rawptr
+HWND :: win32.HWND // rawptr
+HDC :: win32.HDC // rawptr
+HRGN :: win32.HRGN // rawptr
+HGDIOBJ :: win32.HGDIOBJ // rawptr
+HBITMAP :: win32.HBITMAP // rawptr
+HPEN :: win32.HPEN // rawptr
+HBRUSH :: win32.HBRUSH // rawptr
+HICON :: win32.HICON // rawptr
+HCURSOR :: win32.HCURSOR // rawptr
 
 LPARAM :: win32.LPARAM
 WPARAM :: win32.WPARAM
@@ -64,7 +65,7 @@ LRESULT :: win32.LRESULT
 POINT :: win32.POINT
 RECT :: win32.RECT
 
-HRESULT :: win32.HRESULT
+HRESULT :: win32.HRESULT // i32
 HRESULT_DETAILS :: win32.HRESULT_DETAILS
 FACILITY :: win32.FACILITY
 SEVERITY :: win32.SEVERITY
@@ -81,18 +82,10 @@ DECODE_HRESULT :: win32.DECODE_HRESULT
 
 RAWINPUT_CODE :: win32.RAWINPUT_CODE
 
-// when #defined(win32.WS_STYLES) {}
-
 // Window Class Styles
-CS_STYLES :: distinct UINT
-WS_STYLES :: distinct win32.WS_STYLES
-WS_EX_STYLES :: distinct win32.WS_EX_STYLES
-
-// WS_EX_LEFT             : WS_EX_STYLES : {}
-// WS_EX_RIGHTSCROLLBAR   : WS_EX_STYLES : {}
-// WS_EX_LTRREADING       : WS_EX_STYLES : {}
-// WS_EX_OVERLAPPEDWINDOW : WS_EX_STYLES : {.WS_EX_WINDOWEDGE, .WS_EX_CLIENTEDGE}
-// WS_EX_PALETTEWINDOW    : WS_EX_STYLES : {.WS_EX_WINDOWEDGE, .WS_EX_TOOLWINDOW, .WS_EX_TOPMOST}
+CS_STYLES :: distinct UINT // u32
+WS_STYLES :: distinct win32.WS_STYLES // u32
+WS_EX_STYLES :: distinct win32.WS_EX_STYLES // u32
 
 PAINTSTRUCT :: win32.PAINTSTRUCT
 
