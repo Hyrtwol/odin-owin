@@ -11,45 +11,35 @@ stopwatch :: struct {
 	start_tick:          stopwatch_tick,
 	stop_tick:           stopwatch_tick,
 	last_tick:           stopwatch_tick,
-	elapsed_ticks:       stopwatch_tick,
 	start:               proc(this: ^stopwatch),
 	stop:                proc(this: ^stopwatch),
 	get_elapsed_seconds: proc(this: ^stopwatch) -> stopwatch_time,
-	get_elapsed_ms:      proc(this: ^stopwatch) -> stopwatch_time,
 	get_delta_seconds:   proc(this: ^stopwatch) -> stopwatch_time,
 }
 
 performance_frequency: stopwatch_tick = 0
-@(private = "file")
-ticks_to_seconds: stopwatch_time = 0
-@(private = "file")
-ticks_to_millisecond: stopwatch_time = 0
-@(private = "file")
-ticks_to_timespan: stopwatch_time = 0
+
+ticks_to_seconds :: #force_inline proc "contextless" (ticks: stopwatch_tick) -> stopwatch_time {
+	return performance_frequency > 0 ? stopwatch_time(ticks) / stopwatch_time(performance_frequency) : 0
+}
 
 @(private = "file")
 stopwatch_start :: proc(this: ^stopwatch) {
 	win32.Sleep(0)
 	this.stop_tick = 0
-	this.elapsed_ticks = 0
 	win32.QueryPerformanceCounter(&this.start_tick)
+	this.stop_tick = this.start_tick
 	this.last_tick = this.start_tick
 }
 
 @(private = "file")
 stopwatch_stop :: proc(this: ^stopwatch) {
 	win32.QueryPerformanceCounter(&this.stop_tick)
-	this.elapsed_ticks = this.stop_tick - this.start_tick
 }
 
 @(private = "file")
 stopwatch_get_elapsed_seconds :: proc(this: ^stopwatch) -> stopwatch_time {
-	return stopwatch_time(this.elapsed_ticks) * ticks_to_seconds
-}
-
-@(private = "file")
-stopwatch_get_elapsed_ms :: proc(this: ^stopwatch) -> stopwatch_time {
-	return stopwatch_time(this.elapsed_ticks) * ticks_to_millisecond
+	return ticks_to_seconds(this.stop_tick - this.start_tick)
 }
 
 @(private = "file")
@@ -58,16 +48,14 @@ stopwatch_get_delta_seconds :: proc(this: ^stopwatch) -> stopwatch_time {
 	win32.QueryPerformanceCounter(&tick)
 	delta_tick := tick - this.last_tick
 	this.last_tick = tick
-	return stopwatch_time(delta_tick) * ticks_to_seconds
+	return ticks_to_seconds(delta_tick)
 }
 
 create_stopwatch :: proc() -> stopwatch {
 
 	if performance_frequency == 0 {
-		if win32.QueryPerformanceFrequency(&performance_frequency) {
-			ticks_to_seconds = 1.0 / stopwatch_time(performance_frequency)
-			ticks_to_millisecond = 1_000.0 / stopwatch_time(performance_frequency)
-			ticks_to_timespan = 10_000_000.0 / stopwatch_time(performance_frequency)
+		if !win32.QueryPerformanceFrequency(&performance_frequency) {
+			panic("Failed to call win32.QueryPerformanceFrequency")
 		}
 	}
 
@@ -75,11 +63,9 @@ create_stopwatch :: proc() -> stopwatch {
 		start_tick          = 0,
 		stop_tick           = 0,
 		last_tick           = 0,
-		elapsed_ticks       = 0,
 		start               = stopwatch_start,
 		stop                = stopwatch_stop,
 		get_elapsed_seconds = stopwatch_get_elapsed_seconds,
-		get_elapsed_ms      = stopwatch_get_elapsed_ms,
 		get_delta_seconds   = stopwatch_get_delta_seconds,
 	}
 	return sw

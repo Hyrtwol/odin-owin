@@ -40,7 +40,6 @@ LPVOID :: win32.LPVOID // rawptr
 // LPCSTR :: win32.LPCSTR
 // LPWSTR :: win32.LPWSTR
 LPCWSTR :: win32.LPCWSTR // cstring16
-// LPDWORD :: win32.LPDWORD
 LPRECT :: win32.LPRECT
 
 ATOM :: win32.ATOM // u16
@@ -58,9 +57,9 @@ HBRUSH :: win32.HBRUSH // rawptr
 HICON :: win32.HICON // rawptr
 HCURSOR :: win32.HCURSOR // rawptr
 
-LPARAM :: win32.LPARAM
-WPARAM :: win32.WPARAM
-LRESULT :: win32.LRESULT
+LPARAM :: win32.LPARAM // int
+WPARAM :: win32.WPARAM // uintptr
+LRESULT :: win32.LRESULT // int
 
 POINT :: win32.POINT
 RECT :: win32.RECT
@@ -83,8 +82,15 @@ DECODE_HRESULT :: win32.DECODE_HRESULT
 RAWINPUT_CODE :: win32.RAWINPUT_CODE
 
 // Window Class Styles
+// <https://learn.microsoft.com/en-us/windows/win32/winmsg/window-class-styles>
 CS_STYLES :: distinct UINT // u32
+
+// Window Styles
+// <https://learn.microsoft.com/en-us/windows/win32/winmsg/window-styles>
 WS_STYLES :: distinct win32.WS_STYLES // u32
+
+// Extended Window Styles
+// <https://learn.microsoft.com/en-us/windows/win32/winmsg/extended-window-styles>
 WS_EX_STYLES :: distinct win32.WS_EX_STYLES // u32
 
 PAINTSTRUCT :: win32.PAINTSTRUCT
@@ -125,7 +131,12 @@ BITMAPV5HEADER :: win32.BITMAPV5HEADER
 BITMAPINFO :: win32.BITMAPINFO
 BITMAPINFOHEADER :: win32.BITMAPINFOHEADER
 
-IDI_APPLICATION  := wstring(win32._IDI_APPLICATION)
+MAKEINTRESOURCE :: win32.MAKEINTRESOURCEW
+
+// Standard Icon IDs
+
+// MAKEINTRESOURCE(32512)
+IDI_APPLICATION  := LPCWSTR(win32._IDI_APPLICATION)
 IDI_HAND         := wstring(win32._IDI_HAND)
 IDI_QUESTION     := wstring(win32._IDI_QUESTION)
 IDI_EXCLAMATION  := wstring(win32._IDI_EXCLAMATION)
@@ -135,3 +146,33 @@ IDI_SHIELD       := wstring(win32._IDI_SHIELD)
 IDI_WARNING      := IDI_EXCLAMATION
 IDI_ERROR        := IDI_HAND
 IDI_INFORMATION  := IDI_ASTERISK
+
+// Standard Cursor IDs
+
+// MAKEINTRESOURCE(32512)
+IDC_ARROW         := wstring(win32._IDC_ARROW)
+
+ROP :: win32.ROP
+
+/*
+// Ternary raster operations
+ROP_alt :: enum DWORD {
+	SRCCOPY        = win32.SRCCOPY       , // dest = source
+	SRCPAINT       = win32.SRCPAINT      , // dest = source OR dest
+	SRCAND         = win32.SRCAND        , // dest = source AND dest
+	SRCINVERT      = win32.SRCINVERT     , // dest = source XOR dest
+	SRCERASE       = win32.SRCERASE      , // dest = source AND (NOT dest)
+	NOTSRCCOPY     = win32.NOTSRCCOPY    , // dest = (NOT source)
+	NOTSRCERASE    = win32.NOTSRCERASE   , // dest = (NOT src) AND (NOT dest)
+	MERGECOPY      = win32.MERGECOPY     , // dest = (source AND pattern
+	MERGEPAINT     = win32.MERGEPAINT    , // dest = (NOT source) OR dest
+	PATCOPY        = win32.PATCOPY       , // dest = pattern
+	PATPAINT       = win32.PATPAINT      , // dest = DPSnoo
+	PATINVERT      = win32.PATINVERT     , // dest = pattern XOR dest
+	DSTINVERT      = win32.DSTINVERT     , // dest = (NOT dest)
+	BLACKNESS      = win32.BLACKNESS     , // dest = BLACK
+	WHITENESS      = win32.WHITENESS     , // dest = WHITE
+	NOMIRRORBITMAP = win32.NOMIRRORBITMAP, // Do not Mirror the bitmap in this call
+	CAPTUREBLT     = win32.CAPTUREBLT    , // Include layered windows
+}
+*/

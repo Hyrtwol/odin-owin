@@ -6,6 +6,14 @@ import "base:intrinsics"
 import "core:fmt"
 import win32 "core:sys/windows"
 
+//IS_ERROR :: #force_inline proc "contextless" (#any_int hr: int) -> bool { return HRESULT_DETAILS(hr).IsError }
+//HRESULT_CODE :: #force_inline proc "contextless" (#any_int hr: int) -> u16 { return HRESULT_DETAILS(hr).Code }
+//HRESULT_FACILITY :: #force_inline proc "contextless" (#any_int hr: int) -> FACILITY { return HRESULT_DETAILS(hr).Facility }
+
+decode_hresult_details :: #force_inline proc "contextless" (#any_int hr: int) -> HRESULT_DETAILS {
+	return HRESULT_DETAILS(hr)
+}
+
 show_message_box :: #force_inline proc(caption: string, text: string, type: UINT = win32.MB_ICONSTOP | win32.MB_OK) {
 	win32.MessageBoxW(nil, utf8_to_wstring(text), utf8_to_wstring(caption), type)
 }

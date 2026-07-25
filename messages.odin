@@ -52,8 +52,8 @@ WMInput :: struct {
 	is_key_released:                  bool,
 }
 
-decode_wm_input :: #force_inline proc "contextless" (wparam: WPARAM, lparam: LPARAM) -> WMInput {
-	res: WMInput
+decode_wm_input :: #force_inline proc "contextless" (wparam: WPARAM, lparam: LPARAM) -> (res: WMInput) {
+
 	res.vk_code, res.key_flags, res.repeat_count = decode_wm_key_input(wparam, lparam)
 	res.scan_code, res.is_extended_key, res.was_key_down, res.is_key_released = decode_key_flags(res.key_flags)
 
@@ -66,7 +66,7 @@ decode_wm_input :: #force_inline proc "contextless" (wparam: WPARAM, lparam: LPA
 		break
 	}
 
-	return res
+	return
 }
 
 decode_lparam_as_createstruct :: #force_inline proc "contextless" (lparam: LPARAM) -> ^CREATESTRUCTW {
@@ -74,11 +74,11 @@ decode_lparam_as_createstruct :: #force_inline proc "contextless" (lparam: LPARA
 }
 
 MAKELRESULT_FROM_LOHI :: #force_inline proc "contextless" (#any_int l, h: int) -> LRESULT {
-	return win32.LRESULT(win32.MAKELONG(l, h))
+	return LRESULT(win32.MAKELONG(l, h))
 }
 
 MAKELRESULT_FROM_BOOL :: #force_inline proc "contextless" (result: BOOL) -> LRESULT {
-	return win32.LRESULT(transmute(i32)result)
+	return LRESULT(transmute(i32)result)
 }
 
 MAKELRESULT :: proc {

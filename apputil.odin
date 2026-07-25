@@ -29,14 +29,14 @@ get_module_filename :: proc(module: HMODULE, allocator := context.temp_allocator
 
 load_icon :: proc(instance: HINSTANCE) -> HICON {
 	icon: HICON = win32.LoadIconW(instance, wstring((^win32.WCHAR)(win32.MAKEINTRESOURCEW(IDI_ICON1))))
-	if icon == nil {icon = win32.LoadIconW(nil, wstring(win32._IDI_APPLICATION))}
-	if icon == nil {icon = win32.LoadIconW(nil, wstring(win32._IDI_QUESTION))}
+	if icon == nil {icon = win32.LoadIconW(nil, IDI_APPLICATION)}
+	if icon == nil {icon = win32.LoadIconW(nil, IDI_QUESTION)}
 	if icon == nil {show_error_and_panic("Missing icon")}
 	return icon
 }
 
 load_cursor :: proc() -> HCURSOR {
-	cursor: HCURSOR = win32.LoadCursorW(nil, wstring(win32._IDC_ARROW))
+	cursor: HCURSOR = win32.LoadCursorW(nil, IDC_ARROW)
 	if cursor == nil {show_error_and_panic("Missing cursor")}
 	return cursor
 }
@@ -79,9 +79,13 @@ register_window_class :: proc {
 	register_window_class_lean,
 }
 
+atom_to_wstring :: #force_inline proc "contextless" (atom: ATOM) -> win32.LPCWSTR {
+	return wstring((^win32.WCHAR)(uintptr(atom)))
+}
+
 unregister_window_class :: proc(atom: ATOM, instance: HINSTANCE) {
 	if atom == 0 {show_error_and_panic("atom is zero")}
-	if !win32.UnregisterClassW(win32.LPCWSTR((^win32.WCHAR)(uintptr(atom))), instance) {show_error_and_panic("UnregisterClassW")}
+	if !win32.UnregisterClassW(atom_to_wstring(atom), instance) {show_error_and_panic("UnregisterClassW")}
 }
 
 create_window_win32 :: proc(
@@ -98,7 +102,7 @@ create_window_win32 :: proc(
 ) -> HWND {
 	hwnd := win32.CreateWindowExW(
 		win32.UINT(dwExStyle),
-		win32.LPCWSTR((^win32.WCHAR)(uintptr(atom))),
+		atom_to_wstring(atom),
 		utf8_to_wstring(lpWindowName),
 		win32.UINT(dwStyle),
 		expand_values(position),
@@ -383,8 +387,8 @@ select_object :: proc {
 }
 
 @(private = "file")
-stretch_blt_size :: #force_inline proc "contextless" (dest_hdc: HDC, dest_size: int2, src_hdc: HDC, src_size: int2, rop: win32.ROP = .SRCCOPY) -> BOOL {
-	return win32.StretchBlt(dest_hdc, 0, 0, dest_size.x, dest_size.y, src_hdc, 0, 0, src_size.x, src_size.y, win32.DWORD(rop))
+stretch_blt_size :: #force_inline proc "contextless" (dest_hdc: HDC, dest_size: int2, src_hdc: HDC, src_size: int2, rop: ROP = .SRCCOPY) -> BOOL {
+	return win32.StretchBlt(dest_hdc, 0, 0, expand_values(dest_size), src_hdc, 0, 0, expand_values(src_size), win32.DWORD(rop))
 }
 
 stretch_blt :: proc {
@@ -393,8 +397,8 @@ stretch_blt :: proc {
 }
 
 @(private = "file")
-bit_blt_size :: #force_inline proc "contextless" (dest_hdc: HDC, size: int2, src_hdc: HDC, rop: win32.ROP = .SRCCOPY) -> BOOL {
-	return win32.BitBlt(dest_hdc, 0, 0, size.x, size.y, src_hdc, 0, 0, win32.DWORD(rop))
+bit_blt_size :: #force_inline proc "contextless" (dest_hdc: HDC, size: int2, src_hdc: HDC, rop: ROP = .SRCCOPY) -> BOOL {
+	return win32.BitBlt(dest_hdc, 0, 0, expand_values(size), src_hdc, 0, 0, win32.DWORD(rop))
 }
 
 bit_blt :: proc {
