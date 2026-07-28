@@ -116,7 +116,7 @@ create_window_win32 :: proc(
 	return hwnd
 }
 
-create_window_from_settings :: proc(instance: HINSTANCE, atom: ATOM, settings: ^window_settings) -> HWND {
+create_window_from_settings :: proc(instance: HINSTANCE, atom: ATOM, settings: ^Window_Settings) -> HWND {
 	if atom == 0 {show_error_and_panic("atom is zero")}
 
 	if settings.dwStyle == {} {settings.dwStyle = DEFAULT_WS_STYLE}
@@ -136,7 +136,7 @@ create_window :: proc {
 	create_window_from_settings,
 }
 
-register_and_create_window :: proc(settings: ^window_settings) -> (instance: HINSTANCE, atom: ATOM, hwnd: HWND) {
+register_and_create_window :: proc(settings: ^Window_Settings) -> (instance: HINSTANCE, atom: ATOM, hwnd: HWND) {
 	module_handle := get_module_handle()
 	if settings.title == "" {
 		settings.title = filepath.stem(get_module_filename(module_handle))
@@ -177,7 +177,7 @@ loop_messages :: proc(msg: ^win32.MSG, hwnd: HWND = nil) {
 	}
 }
 
-prepare_run :: proc(settings: ^window_settings) -> (inst: HINSTANCE, atom: ATOM, hwnd: HWND) {
+prepare_run :: proc(settings: ^Window_Settings) -> (inst: HINSTANCE, atom: ATOM, hwnd: HWND) {
 	inst, atom, hwnd = register_and_create_window(settings)
 	if .Raw_Input in settings.options {
 		register_raw_input(hwnd)
@@ -186,7 +186,7 @@ prepare_run :: proc(settings: ^window_settings) -> (inst: HINSTANCE, atom: ATOM,
 	return
 }
 
-run :: proc(settings: ^window_settings) -> int {
+run :: proc(settings: ^Window_Settings) -> int {
 	_, _, _ = prepare_run(settings)
 	msg: win32.MSG
 	loop_messages(&msg)
