@@ -23,7 +23,7 @@ Window_Settings :: struct {
 	param:       LPVOID,
 }
 
-DEFAULT_Window_Settings :: Window_Settings {
+DEFAULT_WINDOW_SETTINGS :: Window_Settings {
 	options     = {.Center},
 	dwStyle     = DEFAULT_WS_STYLE,
 	dwExStyle   = DEFAULT_WS_EX_STYLE,
@@ -48,8 +48,8 @@ get_settings_from_lparam :: #force_inline proc "contextless" (lparam: LPARAM, $T
 }
 
 @(private = "file")
-create_Window_Settings_win32 :: proc "contextless" (size: int2, title: string, wndproc: win32.WNDPROC) -> Window_Settings {
-	settings := DEFAULT_Window_Settings
+create_window_settings_win32 :: proc "contextless" (size: int2, title: string, wndproc: win32.WNDPROC) -> Window_Settings {
+	settings := DEFAULT_WINDOW_SETTINGS
 	settings.window_size = size
 	settings.wndproc = wndproc
 	//settings.run = run
@@ -58,11 +58,11 @@ create_Window_Settings_win32 :: proc "contextless" (size: int2, title: string, w
 }
 
 @(private = "file")
-create_Window_Settings_lean :: #force_inline proc "contextless" (size: int2, title: string, wndproc: WNDPROC) -> Window_Settings {
-	return create_Window_Settings_win32(size, title, win32.WNDPROC(wndproc))
+create_window_settings_lean :: #force_inline proc "contextless" (size: int2, title: string, wndproc: WNDPROC) -> Window_Settings {
+	return create_window_settings_win32(size, title, win32.WNDPROC(wndproc))
 }
 
 create_Window_Settings :: proc {
-	create_Window_Settings_win32,
-	create_Window_Settings_lean,
+	create_window_settings_win32,
+	create_window_settings_lean,
 }

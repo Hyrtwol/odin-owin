@@ -7,6 +7,9 @@ import win32 "core:sys/windows"
 stopwatch_tick :: win32.LARGE_INTEGER // i64
 stopwatch_time :: f64
 
+TIME_TO_MILLISECONDS :: 1_000
+TIME_TO_TIMESPAN :: 10_000_000
+
 stopwatch :: struct {
 	start_tick:          stopwatch_tick,
 	stop_tick:           stopwatch_tick,

@@ -152,11 +152,8 @@ IDI_INFORMATION  := IDI_ASTERISK
 // MAKEINTRESOURCE(32512)
 IDC_ARROW         := wstring(win32._IDC_ARROW)
 
-ROP :: win32.ROP
-
-/*
 // Ternary raster operations
-ROP_alt :: enum DWORD {
+ROP :: enum DWORD {
 	SRCCOPY        = win32.SRCCOPY       , // dest = source
 	SRCPAINT       = win32.SRCPAINT      , // dest = source OR dest
 	SRCAND         = win32.SRCAND        , // dest = source AND dest
@@ -175,4 +172,3 @@ ROP_alt :: enum DWORD {
 	NOMIRRORBITMAP = win32.NOMIRRORBITMAP, // Do not Mirror the bitmap in this call
 	CAPTUREBLT     = win32.CAPTUREBLT    , // Include layered windows
 }
-*/
