@@ -40,8 +40,8 @@ pvBits        : screen_buffer
 timer1_id     : owin.UINT_PTR
 timer2_id     : owin.UINT_PTR
 
-application :: struct {
-	#subtype settings: owin.window_settings,
+Application :: struct {
+	#subtype settings: owin.Window_Settings,
 }
 
 decode_scrpos :: proc(lparam: owin.LPARAM) -> owin.int2 {
@@ -63,7 +63,7 @@ set_dot :: proc(pos: owin.int2, col: owin.byte4) {
 
 WM_CREATE :: proc(hwnd: owin.HWND, lparam: owin.LPARAM) -> owin.LRESULT {
 	fmt.println(#procedure, hwnd)
-	app := owin.get_settings_from_lparam(lparam, application)
+	app := owin.get_settings_from_lparam(lparam, Application)
 	if app == nil {owin.show_error_and_panic("Missing app!")}
 	owin.set_settings(hwnd, app)
 	timer1_id = owin.set_timer(hwnd, owin.IDT_TIMER1, 1000)
@@ -93,7 +93,7 @@ WM_CREATE :: proc(hwnd: owin.HWND, lparam: owin.LPARAM) -> owin.LRESULT {
 
 WM_DESTROY :: proc(hwnd: owin.HWND) -> owin.LRESULT {
 	fmt.println(#procedure, hwnd)
-	app := owin.get_settings(hwnd, application)
+	app := owin.get_settings(hwnd, Application)
 	if app == nil {owin.show_error_and_panic("Missing app!")}
 	owin.kill_timer(hwnd, &timer1_id)
 	owin.kill_timer(hwnd, &timer2_id)
@@ -131,7 +131,7 @@ WM_CHAR :: proc(hwnd: owin.HWND, wparam: owin.WPARAM, lparam: owin.LPARAM) -> ow
 WM_SIZE :: proc(hwnd: owin.HWND, wparam: owin.WPARAM, lparam: owin.LPARAM) -> owin.LRESULT {
 	type := owin.WM_SIZE_WPARAM(wparam)
 	size := owin.decode_lparam_as_int2(lparam)
-	app := owin.get_settings(hwnd, application)
+	app := owin.get_settings(hwnd, Application)
 	if app == nil {return 1}
 	fmt.println(#procedure, hwnd, type, size)
 	app.settings.window_size = size
@@ -252,7 +252,7 @@ wndproc :: proc "system" (hwnd: owin.HWND, msg: owin.WM_MSG, wparam: owin.WPARAM
 
 main :: proc() {
 
-	app: application = {
+	app: Application = {
 		settings = owin.create_window_settings({WIDTH, HEIGHT}, TITLE, wndproc),
 	}
 

@@ -62,7 +62,7 @@ create_window_settings_lean :: #force_inline proc "contextless" (size: int2, tit
 	return create_window_settings_win32(size, title, win32.WNDPROC(wndproc))
 }
 
-create_Window_Settings :: proc {
+create_window_settings :: proc {
 	create_window_settings_win32,
 	create_window_settings_lean,
 }

@@ -105,8 +105,8 @@ create_window_win32 :: proc(
 		atom_to_wstring(atom),
 		utf8_to_wstring(lpWindowName),
 		win32.UINT(dwStyle),
-		expand_values(position),
-		expand_values(size),
+		**position,
+		**size,
 		hWndParent,
 		hMenu,
 		hInstance,
@@ -388,7 +388,7 @@ select_object :: proc {
 
 @(private = "file")
 stretch_blt_size :: #force_inline proc "contextless" (dest_hdc: HDC, dest_size: int2, src_hdc: HDC, src_size: int2, rop: ROP = .SRCCOPY) -> BOOL {
-	return win32.StretchBlt(dest_hdc, 0, 0, expand_values(dest_size), src_hdc, 0, 0, expand_values(src_size), win32.DWORD(rop))
+	return win32.StretchBlt(dest_hdc, 0, 0, **dest_size, src_hdc, 0, 0, **src_size, win32.DWORD(rop))
 }
 
 stretch_blt :: proc {
@@ -398,7 +398,7 @@ stretch_blt :: proc {
 
 @(private = "file")
 bit_blt_size :: #force_inline proc "contextless" (dest_hdc: HDC, size: int2, src_hdc: HDC, rop: ROP = .SRCCOPY) -> BOOL {
-	return win32.BitBlt(dest_hdc, 0, 0, expand_values(size), src_hdc, 0, 0, win32.DWORD(rop))
+	return win32.BitBlt(dest_hdc, 0, 0, **size, src_hdc, 0, 0, win32.DWORD(rop))
 }
 
 bit_blt :: proc {
