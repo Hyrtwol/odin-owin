@@ -59,7 +59,9 @@ decode_wm_input :: #force_inline proc "contextless" (wparam: WPARAM, lparam: LPA
 
 	switch res.vk_code {
 	case win32.VK_SHIFT: // converts to VK_LSHIFT or VK_RSHIFT
+		fallthrough
 	case win32.VK_CONTROL: // converts to VK_LCONTROL or VK_RCONTROL
+		fallthrough
 	case win32.VK_MENU:
 		// converts to VK_LMENU or VK_RMENU
 		res.vk_code = win32.LOWORD(win32.MapVirtualKeyW(win32.DWORD(res.scan_code), win32.MAPVK_VSC_TO_VK_EX))
