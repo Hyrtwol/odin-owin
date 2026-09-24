@@ -9,6 +9,7 @@ import "core:time"
 int2 :: [2]i32
 int3 :: [3]i32
 float3 :: [3]f32
+float4 :: [4]f32
 byte4 :: [4]u8
 
 Millisecond :: time.Millisecond
