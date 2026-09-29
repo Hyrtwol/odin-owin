@@ -27,11 +27,7 @@ HRESULT_DETAILS :: bit_field HRESULT {
 	IsError:  bool     | 1,
 }
 
-//IS_ERROR :: #force_inline proc "contextless" (#any_int hr: int) -> bool { return HRESULT_DETAILS(hr).IsError }
-//HRESULT_CODE :: #force_inline proc "contextless" (#any_int hr: int) -> u16 { return HRESULT_DETAILS(hr).Code }
-//HRESULT_FACILITY :: #force_inline proc "contextless" (#any_int hr: int) -> FACILITY { return HRESULT_DETAILS(hr).Facility }
-
-decode_hresult_details :: #force_inline proc "contextless" (#any_int hr: int) -> HRESULT_DETAILS {
+decode_hresult_details :: #force_inline proc "contextless" (#any_int hr: HRESULT) -> HRESULT_DETAILS {
 	return HRESULT_DETAILS(hr)
 }
 
