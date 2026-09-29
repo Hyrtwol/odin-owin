@@ -84,15 +84,15 @@ RAWINPUT_CODE :: win32.RAWINPUT_CODE
 
 // Window Class Styles
 // <https://learn.microsoft.com/en-us/windows/win32/winmsg/window-class-styles>
-CS_STYLES :: distinct UINT // u32
+CS_STYLES :: distinct UINT // win32.CS_STYLES
 
 // Window Styles
 // <https://learn.microsoft.com/en-us/windows/win32/winmsg/window-styles>
-WS_STYLES :: distinct win32.WS_STYLES // u32
+WS_STYLES :: distinct UINT // win32.WS_STYLES
 
 // Extended Window Styles
 // <https://learn.microsoft.com/en-us/windows/win32/winmsg/extended-window-styles>
-WS_EX_STYLES :: distinct win32.WS_EX_STYLES // u32
+WS_EX_STYLES :: distinct UINT // win32.WS_EX_STYLES
 
 PAINTSTRUCT :: win32.PAINTSTRUCT
 
