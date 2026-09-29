@@ -6,6 +6,27 @@ import "base:intrinsics"
 import "core:fmt"
 import win32 "core:sys/windows"
 
+// Values are 32 bit values laid out as follows:
+//
+// * S (1 bit): Severity. If set, indicates a failure result. If clear, indicates a success result.
+// * R (1 bit): Reserved. If the N bit is clear, this bit MUST be set to 0. If the N bit is set, this bit is defined by the NTSTATUS numbering space.
+// * C (1 bit): Customer. This bit specifies if the value is customer-defined or Microsoft-defined. The bit is set for customer-defined values and clear for Microsoft-defined values.
+// * N (1 bit): If set, indicates that the error code is an NTSTATUS value, except that this bit is set.
+// * X (1 bit):  Reserved.  SHOULD be set to 0.
+// * Facility (11 bits): An indicator of the source of the error. New facilities are occasionally added by Microsoft.
+// * Code (2 bytes): The remainder of the error code.
+//
+// <https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/0642cb2f-2075-4469-918c-4441e69c548a>
+HRESULT_DETAILS :: bit_field HRESULT {
+	Code:     u16      | 16,
+	Facility: FACILITY | 11,
+	X:        bool     | 1,
+	N:        bool     | 1,
+	Customer: bool     | 1,
+	R:        bool     | 1,
+	IsError:  bool     | 1,
+}
+
 //IS_ERROR :: #force_inline proc "contextless" (#any_int hr: int) -> bool { return HRESULT_DETAILS(hr).IsError }
 //HRESULT_CODE :: #force_inline proc "contextless" (#any_int hr: int) -> u16 { return HRESULT_DETAILS(hr).Code }
 //HRESULT_FACILITY :: #force_inline proc "contextless" (#any_int hr: int) -> FACILITY { return HRESULT_DETAILS(hr).Facility }
