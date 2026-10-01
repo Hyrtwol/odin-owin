@@ -29,17 +29,15 @@ LONG :: win32.LONG // i32
 INT :: win32.INT // i32
 UINT :: win32.UINT // u32
 WCHAR :: win32.WCHAR // c.wchar_t
-// DWORD_PTR :: win32.DWORD_PTR
 UINT_PTR :: win32.UINT_PTR // uintptr
 LONG_PTR :: win32.LONG_PTR // int
 LARGE_INTEGER :: win32.LARGE_INTEGER // i64
 
 LPVOID :: win32.LPVOID // rawptr
-// LPCVOID :: win32.LPCVOID
-// LPUINT :: win32.LPUINT
-// LPSTR :: win32.LPSTR
-// LPCSTR :: win32.LPCSTR
-// LPWSTR :: win32.LPWSTR
+// LPCVOID :: win32.LPCVOID // rawptr
+// LPSTR :: win32.LPSTR // cstring
+// LPWSTR :: win32.LPWSTR // cstring16
+LPCSTR :: win32.LPCSTR // cstring
 LPCWSTR :: win32.LPCWSTR // cstring16
 LPRECT :: win32.LPRECT
 
