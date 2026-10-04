@@ -3,7 +3,6 @@
 package owin
 
 import win32 "core:sys/windows"
-// import "core:fmt"
 
 // User32
 
@@ -14,16 +13,16 @@ GetDC :: win32.GetDC
 ReleaseDC :: win32.ReleaseDC
 
 //@(private = "file")
-//release_dc_and_reset :: proc(hWnd: HWND, hDC: ^HDC) -> (ok: bool) {
-release_dc_and_reset :: proc(hWnd: HWND, hDC: ^HDC) -> (err: Error) {
+release_dc_and_reset :: proc(hWnd: HWND, hDC: ^HDC) -> (err: Owin_Error) {
 	if hWnd == nil {return .Missing_HWND}
 	if hDC == nil {return .Missing_Argument}
-
-	err = Windows_Error(ReleaseDC(hWnd, hDC^))
-	if err == nil {
-		hDC^ = nil
+	if hDC^ != nil {
+		if ReleaseDC(hWnd, hDC^) != 0 {
+			hDC^ = nil
+		} else {
+			err = .Unable_To_ReleaseDC
+		}
 	}
-
 	return
 }
 
